@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=db_distribution
+  api:
+    image: efner/distribution-engine:v1.0
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_SOURCE=postgresql://root:secret@postgres:5432/db_distribution?sslmode=disable
+    depends_on:
+      - postgres
+    entrypoint: "/app/main"
+  web:
+    image: efner/distribution-web:v1.0
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=http://api
+    depends_on:
+      - api
